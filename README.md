@@ -3,14 +3,14 @@
 `ponskills`（`git@github.com:Phlosy/ponskills.git`）是用于统一沉淀、管理与持续迭代**自主研发 AI Agent Skills** 的个人技能集合仓库（Skills Monorepo）。
 
 > **核心定位**：
-> 1. **非单一 Skill 仓库**：本仓库构建的是一整套自主实现的个人 Skills 体系，每个一级子目录代表一个独立的自研 Skill（例如 [`academic-proposal-defense-workflow/`](./academic-proposal-defense-workflow/SKILL.md)），后续新增的自研 Skills 均在此仓库下统一纳管。
-> 2. **自研编排与第三方 Skill 解耦（类似软件工程 `third_party/` 第三方依赖库机制）**：本仓库仅维护**自主实现**的 Skills；当某些自研 Skill（作为顶层工作流或编排器）需要调用外部开源或配套的第三方 Skills 时，不在本仓库内冗余拷贝第三方代码，而是在拉取本项目后，在工作区内建立专门的 **`third_party_skills/`（第三方技能目录）** 拉取外部依赖，再基于本仓库的自研 Skill 调度第三方 Skills 完成任务。
+> 1. **非单一 Skill 仓库**：本仓库构建的是一整套自主实现的个人 Skills 体系，每个一级子目录代表一个独立的自研 Skill（例如 [`academic-proposal-defense-workflow/`](./academic-proposal-defense-workflow/SKILL.md)、[`docx-template-report/`](./docx-template-report/SKILL.md)），后续新增的自研 Skills 均在此仓库下统一纳管。
+> 2. **自研编排与第三方 Skill 解耦（类似软件工程 `third_party/` 第三方依赖库机制）**：本仓库仅维护**自主实现**的 Skills；当某些自研 Skill（作为顶层工作流或编排器）需要调用外部开源或配套的第三方 Skills 时，不在本仓库内冗余拷贝第三方代码，而是在拉取本项目后，在工作区内建立专门的 **`third_party_skills/`（第三方技能目录）** 拉取外部依赖，再基于本仓库的自研 Skill 调度本仓库内的其他自研 Skill 与 `third_party_skills/` 中的第三方 Skills 完成任务。
 
 ---
 
 ## 一、 仓库架构与第三方技能协同机制
 
-在复杂任务中，自研 Skill 往往承担**领域方法论、强制审批门禁（`⛔ BLOCKING GATES`）、质量准则与顶层多步编排**职责，并按需调用外部成熟的专项第三方 Skill（如原生 PPTX 编译、Word 模板渲染、文本去 AI 化等）。
+在复杂任务中，自研 Skill 往往承担**领域方法论、强制审批门禁（`⛔ BLOCKING GATES`）、确定性文档生成、质量准则与顶层多步编排**职责，并按需调用外部成熟的专项第三方 Skill（如原生 PPTX 编译、论文综述规划、文本去 AI 化等）。
 
 推荐的标准工作区目录结构如下：
 
@@ -23,13 +23,16 @@
 │   │   ├── references/                        # 领域方法论、视觉层级与避坑台账
 │   │   ├── scripts/                           # 第三方依赖检查/拉取脚本、几何碰撞与渲染质检脚本
 │   │   └── templates/                         # 大纲审阅单、术语表与母版模板
+│   ├── docx-template-report/                  # 自研 Skill 2：基于 Word 模板与 OOXML 契约的确定性 DOCX 报告生成
+│   │   ├── SKILL.md                           # 技能主入口与输入契约规范
+│   │   ├── references/                        # 输入契约、映射 Schema 与 OOXML 模式
+│   │   └── scripts/                           # 模板结构检查（inspect_docx.py）与确定性渲染（render_docx.py）
 │   └── <future-self-developed-skill>/         # 自研 Skill N：后续扩展的其他自主研发技能
 │
 ├── third_party_skills/                        # 【第三方依赖技能目录】类似软件项目的 third_party/ 或 vendor/
 │   ├── ppt-master/                            # 第三方依赖示例：SVG 转原生可编辑 DrawingML PPTX
 │   ├── EvoSkills/                             # 第三方依赖示例：论文规划、文献综述与数学推导辅助
-│   ├── humanizer/                             # 第三方依赖示例：学术文本去 AI 痕迹与自然化润色
-│   └── docx-template-report/                  # 第三方依赖示例：严格遵循母版样式的 DOCX 报告渲染
+│   └── humanizer/                             # 第三方依赖示例：学术文本去 AI 痕迹与自然化润色
 │
 └── <your-project-deliverables>/               # 当前课题/项目的文档、代码与产出物
 ```
@@ -64,15 +67,16 @@ git clone https://github.com/blader/humanizer.git third_party_skills/humanizer
 
 ### 3. 调用自研 Skill 执行任务
 
-在对话中指定使用 `ponskills/<skill-name>/SKILL.md`，Agent 将严格按照自研 Skill 定义的流程门禁（如先审阅大纲、再审阅纯母版模板、最后生成正片与全画幅质检）推进，并在底层自动寻址调用 `third_party_skills/` 中的配套工具。
+在对话中指定使用 `ponskills/<skill-name>/SKILL.md`，Agent 将严格按照自研 Skill 定义的流程门禁（如先审阅大纲、再审阅纯母版模板、最后生成正片与全画幅质检）推进，并在底层自动寻址调用同仓库自研 Skill（如 `ponskills/docx-template-report`）与 `third_party_skills/` 中的第三方配套工具。
 
 ---
 
 ## 三、 当前已收录的自研 Skills 列表
 
-| 自研 Skill 名称 | 路径 | 核心功能与定位 | 协同调用的第三方 Skills（存放在 `third_party_skills/`） |
+| 自研 Skill 名称 | 路径 | 核心功能与定位 | 协同调用的依赖 Skills |
 | :--- | :--- | :--- | :--- |
-| **`academic-proposal-defense-workflow`** | [`./academic-proposal-defense-workflow/`](./academic-proposal-defense-workflow/SKILL.md) | 学术报告（开题/中期/技术报告 `.docx`/LaTeX）与答辩/公开学术汇报 PPT（`.pptx`）端到端标准化工作流。<br>内置三大强制人工确认门禁（`⛔ BLOCKING GATE 0/1/2`）、九环叙事法、`80/20` 视觉重心色彩法则、去框套框排版与因页制宜配图规范。 | `ppt-master`<br>`EvoSkills`<br>`humanizer`<br>`docx-template-report` |
+| **`academic-proposal-defense-workflow`** | [`./academic-proposal-defense-workflow/`](./academic-proposal-defense-workflow/SKILL.md) | 学术报告（开题/中期/技术报告 `.docx`/LaTeX）与答辩/公开学术汇报 PPT（`.pptx`）端到端标准化工作流。<br>内置三大强制人工确认门禁（`⛔ BLOCKING GATE 0/1/2`）、九环叙事法、`80/20` 视觉重心色彩法则、去框套框排版与因页制宜配图规范。 | **本库自研**：[`docx-template-report`](./docx-template-report/SKILL.md)<br>**第三方（`third_party_skills/`）**：`ppt-master`、`EvoSkills`、`humanizer` |
+| **`docx-template-report`** | [`./docx-template-report/`](./docx-template-report/SKILL.md) | 基于既有 Word（`.docx`）模板与显式位置映射契约的确定性 OOXML 报告生成工具。<br>严格保持源模板 `styles.xml`、编号、页眉页脚与版式不变，支持段落/区间替换、表格行扩展、图表插入与 SHA-256 完整性校验。 | 独立自研 Skill（无外部第三方 Skill 依赖） |
 
 ---
 

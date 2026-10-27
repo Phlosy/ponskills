@@ -21,18 +21,18 @@ This skill governs the end-to-end authoring of formal academic reports (`.docx` 
 
 ---
 
-## 1. Third-Party Dependent Skills & Repository Registry (`第三方依赖技能目录与自动拉取机制`)
+## 1. Companion Skills & Repository Registry (`协同自研技能与第三方依赖技能目录机制`)
 
-This skill resides inside the self-developed **`ponskills`** repository (`git@github.com:Phlosy/ponskills.git`) and orchestrates four external third-party companion skills. Following the `ponskills` convention (similar to pulling third-party libraries into `third_party/` in software projects), third-party skills are NOT bundled inside `ponskills`; instead, after cloning `ponskills`, they are pulled into a dedicated **`third_party_skills/`** directory in the workspace via [`scripts/ensure_dependent_skills.sh`](./scripts/ensure_dependent_skills.sh).
+This skill resides inside the self-developed **`ponskills`** repository (`git@github.com:Phlosy/ponskills.git`). It coordinates with one sibling self-developed skill in the same repository ([`../docx-template-report`](../docx-template-report/SKILL.md)) and three external third-party companion skills. Following the `ponskills` convention (similar to pulling third-party libraries into `third_party/` in software projects), external third-party skills are NOT bundled inside `ponskills`; instead, after cloning `ponskills`, they are pulled into a dedicated **`third_party_skills/`** directory in the workspace via [`scripts/ensure_dependent_skills.sh`](./scripts/ensure_dependent_skills.sh).
 
-| Third-Party Companion Skill | Canonical Git Repository URL | Default Workspace Path (`third_party_skills/`) | Role in This Workflow |
-| :--- | :--- | :--- | :--- |
-| **`EvoSkills`** | `https://github.com/EvoScientist/EvoSkills.git` | `third_party_skills/EvoSkills/skills/*` | Narrative planning (`paper-planning`), progressive literature chains (`research-survey`), mathematical rigor (`evomath-tao`), manuscript drafting (`paper-writing`), and slide structure (`academic-slides`). |
-| **`humanizer`** | `https://github.com/blader/humanizer.git` | `third_party_skills/humanizer` | Eliminating AI tells, mechanical literal translations, colloquialisms, and inflated filler while preserving recognized domain acronyms. |
-| **`ppt-master`** | `https://github.com/hugohe3/ppt-master.git` | `third_party_skills/ppt-master/skills/ppt-master` (or `../skills/ppt-master/skills/ppt-master`) | Compiling canonical 16:9 SVGs and speaker notes (`notes/total.md`) into native editable DrawingML `.pptx` decks with quality gates. |
-| **`docx-template-report`** | `git@git.dslab.cc:dslab/astroprism/astroprism.git` (`skills/docx-template-report`) | `third_party_skills/docx-template-report` | Deterministic OOXML `.docx` report generation that strictly preserves template `styles.xml`, numbering, and layout contracts. |
+| Companion Skill | Ownership / Type | Canonical Git Repository URL | Default Path | Role in This Workflow |
+| :--- | :--- | :--- | :--- | :--- |
+| **`docx-template-report`** | **Self-Developed (`ponskills` In-Repo)** | `git@github.com:Phlosy/ponskills.git` (`docx-template-report/`) | `ponskills/docx-template-report` | Deterministic OOXML `.docx` report generation that strictly preserves template `styles.xml`, numbering, and layout contracts. |
+| **`EvoSkills`** | **Third-Party (`third_party_skills/`)** | `https://github.com/EvoScientist/EvoSkills.git` | `third_party_skills/EvoSkills/skills/*` | Narrative planning (`paper-planning`), progressive literature chains (`research-survey`), mathematical rigor (`evomath-tao`), manuscript drafting (`paper-writing`), and slide structure (`academic-slides`). |
+| **`humanizer`** | **Third-Party (`third_party_skills/`)** | `https://github.com/blader/humanizer.git` | `third_party_skills/humanizer` | Eliminating AI tells, mechanical literal translations, colloquialisms, and inflated filler while preserving recognized domain acronyms. |
+| **`ppt-master`** | **Third-Party (`third_party_skills/`)** | `https://github.com/hugohe3/ppt-master.git` | `third_party_skills/ppt-master/skills/ppt-master` (or `../skills/ppt-master/skills/ppt-master`) | Compiling canonical 16:9 SVGs and speaker notes (`notes/total.md`) into native editable DrawingML `.pptx` decks with quality gates. |
 
-Verify third-party companion skill availability before execution:
+Verify companion skill availability before execution:
 
 ```bash
 bash ponskills/academic-proposal-defense-workflow/scripts/ensure_dependent_skills.sh --check

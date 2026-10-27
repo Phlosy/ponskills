@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Ensure all third-party companion skills required by
-# `academic-proposal-defense-workflow` (inside `ponskills`) are present in the
-# workspace's `third_party_skills/` directory (similar to pulling third-party
-# libraries in software projects).
+# Ensure all companion skills required by `academic-proposal-defense-workflow`
+# (inside `ponskills`) are present:
+#   1. In-repo sibling self-developed skill: `ponskills/docx-template-report`
+#   2. External third-party skills in `${WORKSPACE_ROOT}/third_party_skills/`:
+#      - EvoSkills
+#      - humanizer
+#      - ppt-master
 #
 # Usage:
 #   bash ponskills/academic-proposal-defense-workflow/scripts/ensure_dependent_skills.sh --check
@@ -25,7 +28,6 @@ MODE="${1:---check}"
 EVOSKILLS_REPO="https://github.com/EvoScientist/EvoSkills.git"
 HUMANIZER_REPO="https://github.com/blader/humanizer.git"
 PPT_MASTER_REPO="https://github.com/hugohe3/ppt-master.git"
-ASTROPRISM_REPO="git@git.dslab.cc:dslab/astroprism/astroprism.git"
 
 missing=0
 
@@ -58,7 +60,15 @@ check_or_clone() {
   fi
 }
 
-echo "=== Checking Third-Party Companion Skills (Target: ${THIRD_PARTY_DIR}) ==="
+echo "=== 1. Checking In-Repo Self-Developed Skills (${PONSKILLS_ROOT}) ==="
+if [[ -d "${PONSKILLS_ROOT}/docx-template-report" ]]; then
+  echo "[OK] docx-template-report (in-repo self-developed) found at: ${PONSKILLS_ROOT}/docx-template-report"
+else
+  echo "[MISSING] docx-template-report not found at ${PONSKILLS_ROOT}/docx-template-report"
+  missing=$((missing + 1))
+fi
+
+echo "=== 2. Checking Third-Party Companion Skills (Target: ${THIRD_PARTY_DIR}) ==="
 check_or_clone "EvoSkills" \
   "${THIRD_PARTY_DIR}/EvoSkills" \
   "${WORKSPACE_ROOT}/../skills/EvoSkills" \
@@ -77,27 +87,9 @@ check_or_clone "ppt-master" \
   "${PONSKILLS_ROOT}/third_party_skills/ppt-master" \
   "${PPT_MASTER_REPO}"
 
-if [[ -d "${THIRD_PARTY_DIR}/docx-template-report" ]]; then
-  echo "[OK] docx-template-report found at: ${THIRD_PARTY_DIR}/docx-template-report"
-elif [[ -d "${WORKSPACE_ROOT}/../skills/docx-template-report" ]]; then
-  echo "[OK] docx-template-report found at fallback: ${WORKSPACE_ROOT}/../skills/docx-template-report"
-elif [[ "${MODE}" == "--install" ]]; then
-  mkdir -p "${THIRD_PARTY_DIR}"
-  echo "[INSTALL] Fetching docx-template-report from ${ASTROPRISM_REPO} -> ${THIRD_PARTY_DIR}/docx-template-report ..."
-  tmp_dir="$(mktemp -d)"
-  if git clone --depth 1 --filter=blob:none --sparse "${ASTROPRISM_REPO}" "${tmp_dir}" && git -C "${tmp_dir}" sparse-checkout set skills/docx-template-report; then
-    cp -R "${tmp_dir}/skills/docx-template-report" "${THIRD_PARTY_DIR}/docx-template-report"
-    echo "[OK] Installed docx-template-report at: ${THIRD_PARTY_DIR}/docx-template-report"
-  fi
-  rm -rf "${tmp_dir}"
-else
-  echo "[MISSING] docx-template-report not found at ${THIRD_PARTY_DIR}/docx-template-report (upstream: ${ASTROPRISM_REPO} :: skills/docx-template-report)"
-  missing=$((missing + 1))
-fi
-
 if [[ "${missing}" -gt 0 && "${MODE}" != "--install" ]]; then
   echo "Run 'bash ${BASH_SOURCE[0]} --install' to automatically create ${THIRD_PARTY_DIR} and clone missing third-party skill repositories."
   exit 1
 fi
 
-echo "=== All third-party companion skill checks completed ==="
+echo "=== All companion skill checks completed ==="

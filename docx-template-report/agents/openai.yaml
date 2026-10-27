@@ -1,0 +1,4 @@
+interface:
+  display_name: "DOCX Template Report"
+  short_description: "Render validated DOCX reports from OOXML templates"
+  default_prompt: "Use $docx-template-report to implement a report generator from my DOCX template and declared insertion locations."
