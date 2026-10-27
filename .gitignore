@@ -1,0 +1,12 @@
+# macOS & OS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Third-party skills (if cloned inside ponskills/ instead of workspace root)
+third_party_skills/
